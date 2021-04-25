@@ -1,4 +1,1 @@
-# COMP5329 Assignment01 Instruction
-
-You can click the link of colab and run it directly
-
+test official code from <When Radiology Report Generation Meets Knowledge Graph>. Thanks a lot to the paper's author team! {Yixiao Zhang,1 Xiaosong Wang,2 Ziyue Xu,2 Qihang Yu,1 Alan Yuille,1 Daguang Xu2}
