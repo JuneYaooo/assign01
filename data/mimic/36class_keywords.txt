@@ -1,0 +1,36 @@
+Atelectasis
+Cardiomegaly
+Consolidation
+Edema
+Enlarged Cardiomediastinum
+Fracture
+Lung Lesion
+Lung Opacity
+No Finding
+Pleural Effusion
+Pleural Other
+Pneumonia
+Pneumothorax
+Support Devices
+Abdomen
+Abdominal Cavity
+Aorta
+Aorta, Thoracic
+Chest Tubes
+Cough
+Diaphragm
+Exudates And Transudates
+Heart
+Heart Atria
+Heart Ventricles
+Lung
+Mediastinum
+Pleura
+Ribs
+Spine
+Sternotomy
+Surgical Instruments
+Thoracic Cavity
+Thoracic Wall
+Thorax
+Trachea
