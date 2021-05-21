@@ -37,7 +37,7 @@ def get_args():
     parser.add_argument('--decoder-lr', type=float, default=1e-4)
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--gpus', type=str, default='0')
-    parser.add_argument('--num_classes', type=int, default=20)
+    parser.add_argument('--num_classes', type=int, default=36)
     parser.add_argument('--clip-value', type=float, default=5.0)
 
     args = parser.parse_args()

@@ -33,10 +33,10 @@ if __name__ == '__main__':
     counter = Counter()
     for caseid, report in reports.items():
         text = ''
-        if report['findings'] is not None:
-            text += report['findings']
+        if 'impression' in report and report['impression'] is not None:
+            text += report['impression']
         text += ' '
-        if report['impression'] is not None:
+        if 'findings' in report and report['findings'] is not None:
             text += report['impression']
         text = text.lower().translate(str.maketrans('', '', string.punctuation.replace('.', '')))
         text = text.replace('.', ' .')
