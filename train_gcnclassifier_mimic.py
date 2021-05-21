@@ -224,7 +224,7 @@ if __name__ == '__main__':
             #         count+=1
             #         if count >5:
             #             break
-            # y_hat = (y_score >= 0.5).type(torch.int)
+            y_hat = (y_score >= 0.5).type(torch.int)
             y = y.numpy()
             y_score = y_score.numpy()
             y_hat = y_hat.numpy()
