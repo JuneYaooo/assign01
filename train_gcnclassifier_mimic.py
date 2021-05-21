@@ -199,11 +199,11 @@ if __name__ == '__main__':
             y_score = y_score.numpy()
             y_hat = y_hat.numpy()
             precision, recall, f, _ = precision_recall_fscore_support(y, y_hat)
-              print('Epoch {}/{}, P {:.4f}, R {:.4f}, F {:.4f}'.format(
-                  epoch, args.num_epochs, precision.mean(), recall.mean(), f.mean()))
-              writer.add_scalar('precision', precision.mean(), epoch)
-              writer.add_scalar('recall', recall.mean(), epoch)
-              writer.add_scalar('f', f.mean(), epoch)
+            print('Epoch {}/{}, P {:.4f}, R {:.4f}, F {:.4f}'.format(
+              epoch, args.num_epochs, precision.mean(), recall.mean(), f.mean()))
+            writer.add_scalar('precision', precision.mean(), epoch)
+            writer.add_scalar('recall', recall.mean(), epoch)
+            writer.add_scalar('f', f.mean(), epoch)
 
             # test
             count=0
