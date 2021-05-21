@@ -199,16 +199,11 @@ if __name__ == '__main__':
             y_score = y_score.numpy()
             y_hat = y_hat.numpy()
             precision, recall, f, _ = precision_recall_fscore_support(y, y_hat)
-            try:
-              roc_auc = roc_auc_score(y, y_score, average=None)
-              print('Epoch {}/{}, P {:.4f}, R {:.4f}, F {:.4f}, AUC {:.4f}'.format(
-                  epoch, args.num_epochs, precision.mean(), recall.mean(), f.mean(), roc_auc.mean()))
-              writer.add_scalar('precision', precision[:10].mean(), epoch)
-              writer.add_scalar('recall', recall[:10].mean(), epoch)
-              writer.add_scalar('f', f[:10].mean(), epoch)
-              writer.add_scalar('auc', roc_auc.mean(), epoch)
-            except ValueError:
-              pass
+              print('Epoch {}/{}, P {:.4f}, R {:.4f}, F {:.4f}'.format(
+                  epoch, args.num_epochs, precision.mean(), recall.mean(), f.mean()))
+              writer.add_scalar('precision', precision.mean(), epoch)
+              writer.add_scalar('recall', recall.mean(), epoch)
+              writer.add_scalar('f', f.mean(), epoch)
 
             # test
             count=0
@@ -220,25 +215,19 @@ if __name__ == '__main__':
                     scores = torch.sigmoid(model(images1, images2)).detach().cpu()
                     y[i] = labels[0]
                     y_score[i] = scores[0]
-                                        # for test
-            #         count+=1
-            #         if count >5:
-            #             break
+
             y_hat = (y_score >= 0.5).type(torch.int)
             y = y.numpy()
             y_score = y_score.numpy()
             y_hat = y_hat.numpy()
             p, r, f, _ = precision_recall_fscore_support(y, y_hat)
-            try:
-              roc_auc = roc_auc_score(y, y_score, average=None)
-              print('Epoch {}/{}, P {:.4f}, R {:.4f}, F {:.4f}, AUC {:.4f}'.format(
-                  epoch, args.num_epochs, p.mean(), r.mean(), f.mean(), roc_auc.mean()))
-              df = np.stack([p, r, f, roc_auc], axis=1)
-              df = pd.DataFrame(df, columns=['precision', 'recall', 'f1', 'auc'])
-              df.insert(0, 'name', keywords)
-              df.to_csv(os.path.join('./output', args.name + '_e{}.csv'.format(epoch)))
-            except ValueError:
-              pass
+            print('Epoch {}/{}, P {:.4f}, R {:.4f}, F {:.4f}'.format(
+            epoch, args.num_epochs, p.mean(), r.mean(), f.mean()))
+            df = np.stack([p, r, f], axis=1)
+            df = pd.DataFrame(df, columns=['precision', 'recall', 'f1'])
+            df.insert(0, 'name', keywords)
+            df.to_csv(os.path.join('./output', args.name + '_e{}.csv'.format(epoch)))
+
 
 
     writer.close()
