@@ -20,6 +20,7 @@ def get_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--name', type=str, required=True)
+    parser.add_argument('--output-dir', type=str, default='./output')
     parser.add_argument('--model-path', type=str, default='./models')
     parser.add_argument('--pretrained', type=str, default='./models/pretrained/model_ones_3epoch_densenet.tar')
     parser.add_argument('--checkpoint', type=str, default='')
@@ -50,6 +51,7 @@ if __name__ == '__main__':
 
     os.makedirs(args.model_path, exist_ok=True)
     os.makedirs(args.log_path, exist_ok=True)
+    os.makedirs(args.output_dir, exist_ok=True)
 
     logging.basicConfig(filename=os.path.join(args.log_path, args.name + '.log'), level=logging.INFO)
     print('------------------------Model and Training Details--------------------------')
@@ -226,7 +228,7 @@ if __name__ == '__main__':
             df = np.stack([p, r, f], axis=1)
             df = pd.DataFrame(df, columns=['precision', 'recall', 'f1'])
             df.insert(0, 'name', keywords)
-            df.to_csv(os.path.join('./output', args.name + '_e{}.csv'.format(epoch)))
+            df.to_csv(os.path.join(args.output_dir, args.name + '_e{}.csv'.format(epoch)))
 
 
 
