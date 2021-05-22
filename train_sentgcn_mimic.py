@@ -20,6 +20,7 @@ def get_args():
     parser.add_argument('--name', type=str, required=True)
     parser.add_argument('--model-dir', type=str, default='./models')
     parser.add_argument('--output-dir', type=str, default='./output')
+    parser.add_argument('--evaluation-dir', type=str, default='./runs')
     parser.add_argument('--pretrained', type=str, default='./models/mlclassifier_ones3_t012v3t4_lr1e-6_e95.pth')
     parser.add_argument('--checkpoint', type=str, default='')
     parser.add_argument('--dataset-dir', type=str, default='./data')
@@ -51,6 +52,7 @@ if __name__ == '__main__':
     os.makedirs(args.model_dir, exist_ok=True)
     os.makedirs(args.output_dir, exist_ok=True)
     os.makedirs(args.log_dir, exist_ok=True)
+    os.makedirs(args.evaluation_dir, exist_ok=True)
 
     logging.basicConfig(filename=os.path.join(args.log_dir, args.name + '.log'), level=logging.INFO)
     print('------------------------Model and Training Details--------------------------')
@@ -58,7 +60,7 @@ if __name__ == '__main__':
     for k, v in vars(args).items():
         logging.info('{}: {}'.format(k, v))
 
-    writer = SummaryWriter(log_dir=os.path.join('./runs', args.name))
+    writer = SummaryWriter(log_dir=os.path.join(args.evaluation_dir, args.name))
 
     gpus = [int(_) for _ in list(args.gpus)]
     device = torch.device('cuda:{}'.format(gpus[0]) if torch.cuda.is_available() else 'cpu')
