@@ -25,6 +25,7 @@ def get_args():
     parser.add_argument('--pretrained', type=str, default='./models/pretrained/model_ones_3epoch_densenet.tar')
     parser.add_argument('--checkpoint', type=str, default='')
     parser.add_argument('--dataset-dir', type=str, default='./data')
+    parser.add_argument('--evaluation-dir', type=str, default='./runs')
     parser.add_argument('--train-folds', type=str, default='012')
     parser.add_argument('--val-folds', type=str, default='3')
     parser.add_argument('--test-folds', type=str, default='4')
@@ -52,6 +53,7 @@ if __name__ == '__main__':
     os.makedirs(args.model_path, exist_ok=True)
     os.makedirs(args.log_path, exist_ok=True)
     os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(args.evaluation_dir, exist_ok=True)
 
     logging.basicConfig(filename=os.path.join(args.log_path, args.name + '.log'), level=logging.INFO)
     print('------------------------Model and Training Details--------------------------')
@@ -59,7 +61,7 @@ if __name__ == '__main__':
     for k, v in vars(args).items():
         logging.info('{}: {}'.format(k, v))
 
-    writer = SummaryWriter(log_dir=os.path.join('/runs', args.name))
+    writer = SummaryWriter(log_dir=os.path.join(args.evaluation_dir, args.name))
 
     device = torch.device('cuda:{}'.format(args.gpus[0]) if torch.cuda.is_available() else 'cpu')
     gpus = [int(_) for _ in list(args.gpus)]
