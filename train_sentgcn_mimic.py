@@ -192,16 +192,16 @@ if __name__ == '__main__':
 
         if epoch % args.log_freq == 0:
 
-            # save_fname = os.path.join(args.model_dir, '{}_e{}.pth'.format(args.name, epoch))
-            # if len(gpus) > 1:
-            #     state_dict = model.module.state_dict()
-            # else:
-            #     state_dict = model.state_dict()
-            # torch.save({
-            #     'epoch': epoch,
-            #     'model_state_dict': state_dict,
-            #     'optimizer_state_dict': optimizer.state_dict(),
-            # }, save_fname)
+            save_fname = os.path.join(args.model_dir, '{}_e{}.pth'.format(args.name, epoch))
+            if len(gpus) > 1:
+                state_dict = model.module.state_dict()
+            else:
+                state_dict = model.state_dict()
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': state_dict,
+                'optimizer_state_dict': optimizer.state_dict(),
+            }, save_fname)
 
             model.dropout.eval()
             val_res = {}
