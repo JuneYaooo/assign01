@@ -1,0 +1,24 @@
+No Finding
+Enlarged Cardiomediastinum
+Cardiomegaly
+Lung Lesion
+Lung Opacity
+Edema
+Consolidation
+Pneumonia
+Atelectasis
+Pneumothorax
+Pleural Effusion
+Pleural Other
+Fracture
+Support Devices
+Diaphragm
+Granuloma
+Heart
+Lung
+Mediastinum
+Ribs
+Spine
+Spondylosis
+Sternotomy
+Trachea
