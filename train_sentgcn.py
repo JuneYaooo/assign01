@@ -3,6 +3,7 @@ from sentgcn import SentGCN
 from evaluate import evaluate
 from my_build_vocab import Vocabulary
 import os
+import re
 import math
 import argparse
 import logging
@@ -19,7 +20,9 @@ def get_args():
 
     parser.add_argument('--name', type=str, required=True)
     parser.add_argument('--model-dir', type=str, default='./models')
+    parser.add_argument('--kg-dir', type=str, default='./data/iuxray/VSE_GCN_adjacency_matrix_IUXRAY.txt')
     parser.add_argument('--output-dir', type=str, default='./output')
+    parser.add_argument('--evaluation-dir', type=str, default='./runs')
     parser.add_argument('--pretrained', type=str, default='./models/mlclassifier_ones3_t012v3t4_lr1e-6_e95.pth')
     parser.add_argument('--checkpoint', type=str, default='')
     parser.add_argument('--dataset-dir', type=str, default='./data')
@@ -37,7 +40,7 @@ def get_args():
     parser.add_argument('--decoder-lr', type=float, default=1e-4)
     parser.add_argument('--batch-size', type=int, default=8)
     parser.add_argument('--gpus', type=str, default='0')
-    parser.add_argument('--num_classes', type=int, default=20)
+    parser.add_argument('--num_classes', type=int, default=36)
     parser.add_argument('--clip-value', type=float, default=5.0)
 
     args = parser.parse_args()
@@ -51,6 +54,7 @@ if __name__ == '__main__':
     os.makedirs(args.model_dir, exist_ok=True)
     os.makedirs(args.output_dir, exist_ok=True)
     os.makedirs(args.log_dir, exist_ok=True)
+    os.makedirs(args.evaluation_dir, exist_ok=True)
 
     logging.basicConfig(filename=os.path.join(args.log_dir, args.name + '.log'), level=logging.INFO)
     print('------------------------Model and Training Details--------------------------')
@@ -58,7 +62,7 @@ if __name__ == '__main__':
     for k, v in vars(args).items():
         logging.info('{}: {}'.format(k, v))
 
-    writer = SummaryWriter(log_dir=os.path.join('./runs', args.name))
+    writer = SummaryWriter(log_dir=os.path.join(args.evaluation_dir, args.name))
 
     gpus = [int(_) for _ in list(args.gpus)]
     device = torch.device('cuda:{}'.format(gpus[0]) if torch.cuda.is_available() else 'cpu')
@@ -74,29 +78,13 @@ if __name__ == '__main__':
     test_set = Biview_MultiSent('test', args.dataset_dir, args.test_folds, args.report_path, args.vocab_path, args.label_path)
     test_loader = DataLoader(test_set, batch_size=1, shuffle=False, num_workers=1, collate_fn=sent_collate_fn)
 
-    fw_adj = torch.tensor([
-        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ], dtype=torch.float, device=device)
+    # load knowledge graph
+    kg = []
+    with open(args.kg_dir) as f:
+        for line in f.readlines():
+            kg.append([float(i) for i in re.split(',|\[|\]', line) if i not in ['', ' ', '\n']])
+
+    fw_adj = torch.tensor(kg, dtype=torch.float, device=device)
     bw_adj = fw_adj.t()
 
     model = SentGCN(args.num_classes, fw_adj, bw_adj, len(vocab)).to(device)
@@ -176,16 +164,16 @@ if __name__ == '__main__':
 
         if epoch % args.log_freq == 0:
 
-            # save_fname = os.path.join(args.model_dir, '{}_e{}.pth'.format(args.name, epoch))
-            # if len(gpus) > 1:
-            #     state_dict = model.module.state_dict()
-            # else:
-            #     state_dict = model.state_dict()
-            # torch.save({
-            #     'epoch': epoch,
-            #     'model_state_dict': state_dict,
-            #     'optimizer_state_dict': optimizer.state_dict(),
-            # }, save_fname)
+            save_fname = os.path.join(args.model_dir, '{}_e{}.pth'.format(args.name, epoch))
+            if len(gpus) > 1:
+                state_dict = model.module.state_dict()
+            else:
+                state_dict = model.state_dict()
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': state_dict,
+                'optimizer_state_dict': optimizer.state_dict(),
+            }, save_fname)
 
             model.dropout.eval()
             val_res = {}
@@ -208,7 +196,6 @@ if __name__ == '__main__':
                         words.append(w)
                     val_res[caseid][0] += ' '.join(words)
                     val_res[caseid][0] += ' '
-
                 if epoch == start_epoch:
                     val_gts[caseid] = ['']
                     cap = captions[0]
@@ -223,7 +210,6 @@ if __name__ == '__main__':
                             words.append(w)
                         val_gts[caseid][0] += ' '.join(words)
                         val_gts[caseid][0] += ' '
-
             scores = evaluate(val_gts, val_res)
             writer.add_scalar('VAL BLEU 1', scores['Bleu_1'], epoch)
             writer.add_scalar('VAL BLEU 2', scores['Bleu_2'], epoch)
