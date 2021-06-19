@@ -34,6 +34,7 @@ def get_args():
     parser.add_argument('--report-path', type=str, default='./data/mimic/reports.json')
     parser.add_argument('--vocab-path', type=str, default='./data/vocab.pkl')
     parser.add_argument('--label-path', type=str, default='./data/mimic/label.json')
+    parser.add_argument('--keyword-path', type=str, default='./data/iuxray/24class_keywords.txt')
     parser.add_argument('--log-path', type=str, default='./data/mimic/logs')
     parser.add_argument('--log-freq', type=int, default=3)
     parser.add_argument('--num-epochs', type=int, default=100)
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     gpus = [int(_) for _ in list(args.gpus)]
     torch.manual_seed(args.seed)
 
-    with open('./data/iuxray/24class_keywords.txt') as f:
+    with open(args.keyword_path) as f:
         keywords = f.read().splitlines()
     # keywords.append('other')
 
